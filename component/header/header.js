@@ -1,10 +1,17 @@
 import React from 'react'
 import { Link } from 'react-router'
 import Login from '../login/Login'
+import Alert from '../alert/Alert'
 import { connect } from 'react-redux'
 
 var Header = React.createClass({
     render() {
+        var alert = [];
+        for(var i = 0; i < this.props.num; i++) {
+            alert.push(
+                (<Alert kind={ this.props.kind } message={ this.props.info } key={i} />)
+            )
+        }
         return (
         <div className='header' key="head">
             <div>
@@ -33,9 +40,18 @@ var Header = React.createClass({
                     </div>
                 </div>
             </div>
+            { alert }
             {this.props.children}
         </div>
     )}
 })
 
-export default Header
+function tip(state) {
+    return {
+        info: state.reducers.info,
+        num: state.reducers.num,
+        kind: state.reducers.kind
+    }
+}
+
+export default connect(tip)(Header)

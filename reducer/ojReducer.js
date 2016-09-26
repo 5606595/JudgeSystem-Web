@@ -38,6 +38,9 @@ export default function (state={
         isLogin: 0,
         username: ""
     },
+    num: 0,
+    info: "",
+    kind: "",
     statInfoList: [],
     cstInfoList: []
     // success: false
@@ -97,9 +100,15 @@ export default function (state={
             })
         case 'LOGINFAIL':
             return Object.assign({}, state, {
-                login: {
-                    isLogin: 2
-                }
+                num: state.num + 1,
+                info: action.info,
+                kind: "error"
+            })
+        case 'SIGNUPFAIL':
+            return Object.assign({}, state, {
+                num: state.num + 1,
+                info: action.info,
+                kind: "error"
             })
         case 'LOGOUT':
             return Object.assign({}, state, {
@@ -107,6 +116,12 @@ export default function (state={
                     isLogin: 0,
                     username: ""
                 }
+            })
+        case 'LOGINSUCCESS':
+            return Object.assign({}, state, {
+                num: state.num + 1,
+                info: 'login success',
+                kind: 'success'
             })
         // case 'EMPTY':
         //     return Object.assign({}, state, {

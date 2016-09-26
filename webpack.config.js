@@ -3,7 +3,7 @@ const webpack = require('webpack')
 module.exports = {
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: "bundle.js"
+        filename: "bundle.js",
         // publicPath: 'http://localhost:3000/dist/'
     },
     entry: [

@@ -25,8 +25,9 @@ export function login(username, password) {
                 console.log('request succeeded with JSON response', data);
                 if(data.status == 200) {
                     dispatch(status(data));
+                    dispatch(loginSuccess());
                 } else {
-                    dispatch(loginFail());
+                    dispatch(loginFail(data.info));
                 }
             }).catch((err) => {
             console.log('error failed', err);
@@ -43,6 +44,8 @@ export function signup(username, email, password, check) {
                 console.log('request succeeded with JSON response', data);
                 if(data.status == 200) {
                     dispatch(status(data));
+                } else {
+                    dispatch(signupFail(data.info));
                 }
             }).catch((err) => {
             console.log('error failed', err);
@@ -96,9 +99,23 @@ function out() {
     }
 }
 
-function loginFail() {
+function signupFail(data) {
     return {
-        type: "LOGINFAIL"
+        type: 'SIGNUPFAIL',
+        info: data
+    }
+}
+
+function loginFail(data) {
+    return {
+        type: "LOGINFAIL",
+        info: data
+    }
+}
+
+function loginSuccess() {
+    return {
+        type: "LOGINSUCCESS",
     }
 }
 
