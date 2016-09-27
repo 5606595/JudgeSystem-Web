@@ -2,6 +2,8 @@
  * Created by jorten on 16/9/12.
  */
 
+import { browserHistory } from 'react-router'
+
 function checkStatus(response) {
     if(response.status >= 200 && response.status < 300) {
         return response;
@@ -30,7 +32,7 @@ export function problem(pid, key) {
     }
 }
 
-export function submit(pid, code) {
+export function submit(pid, code, author, props) {
     return function(dispatch) {
         // fetch('/ssubmit', {
         //     method: 'POST',
@@ -58,12 +60,17 @@ export function submit(pid, code) {
         xhr.onreadystatechange = function() {
             if(xhr.readyState == 4) {
                 if((xhr.status >= 200 & xhr.status <= 300) || xhr.status == 304) {
-                    var text = xhr.responseText;
-                    console.log(text);
+                    var text = JSON.parse(xhr.responseText);
+                    if(text.status == 200) {
+                        dispatch(submitSuccess())
+                        browserHistory.push('/status')
+                    } else {
+                        dispatch(submitFail())
+                    }
                 }
             }
         }
-        xhr.send("pid=" + pid + "&code=" + code + "&lang=c");
+        xhr.send("pid=" + pid + "&code=" + code + "&lang=c&author=" + author);
     }
 }
 
@@ -73,6 +80,25 @@ export function submit(pid, code) {
 //         type: 'EMPTY'
 //     }
 // }
+
+export function requireLogin() {
+    return {
+        type: 'REQUIRELOGIN'
+    }
+}
+
+function submitSuccess() {
+    return {
+        type: 'SUBMITSUCCESS'
+    }
+}
+
+function submitFail() {
+    return {
+        type: 'SUBMITFAIL'
+    }
+}
+
 
 function detail(data, key) {
     return {

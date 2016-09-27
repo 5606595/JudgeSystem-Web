@@ -149,6 +149,7 @@
 	            _react2.default.createElement(_reactRouter.Route, { path: '/problem/:pid', component: _Problem2.default }),
 	            _react2.default.createElement(_reactRouter.Route, { path: '/submit/:pid', component: _Codemirror2.default }),
 	            _react2.default.createElement(_reactRouter.Route, { path: '/contests', component: _ContestsSection2.default }),
+	            _react2.default.createElement(_reactRouter.Route, { path: '/status', component: _StatusSection2.default }),
 	            _react2.default.createElement(_reactRouter.Route, { path: '/about', component: _About2.default }),
 	            _react2.default.createElement(_reactRouter.Route, { path: '/signup', component: _Signup2.default }),
 	            _react2.default.createElement(_reactRouter.Route, { path: '*', component: NoMatch })
@@ -29403,6 +29404,24 @@
 	                info: 'login success',
 	                kind: 'success'
 	            });
+	        case 'REQUIRELOGIN':
+	            return Object.assign({}, state, {
+	                num: state.num + 1,
+	                info: 'You have not logined',
+	                kind: 'error'
+	            });
+	        case 'SUBMITSUCCESS':
+	            return Object.assign({}, state, {
+	                num: state.num + 1,
+	                info: 'submit success',
+	                kind: 'success'
+	            });
+	        case 'SUBMITFAIL':
+	            return Object.assign({}, state, {
+	                num: state.num + 1,
+	                info: 'submit fail, please contact the admin',
+	                kind: 'error'
+	            });
 	        // case 'EMPTY':
 	        //     return Object.assign({}, state, {
 	        //         detail: {}
@@ -36129,7 +36148,7 @@
 
 /***/ },
 /* 319 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
@@ -36138,9 +36157,9 @@
 	});
 	exports.problem = problem;
 	exports.submit = submit;
-	/**
-	 * Created by jorten on 16/9/12.
-	 */
+	exports.requireLogin = requireLogin;
+
+	var _reactRouter = __webpack_require__(173);
 
 	function checkStatus(response) {
 	    if (response.status >= 200 && response.status < 300) {
@@ -36150,7 +36169,9 @@
 	        error.response = response;
 	        throw error;
 	    }
-	}
+	} /**
+	   * Created by jorten on 16/9/12.
+	   */
 
 	function parseJSON(response) {
 	    return response.json();
@@ -36167,7 +36188,7 @@
 	    };
 	}
 
-	function submit(pid, code) {
+	function submit(pid, code, author, props) {
 	    return function (dispatch) {
 	        // fetch('/ssubmit', {
 	        //     method: 'POST',
@@ -36195,12 +36216,17 @@
 	        xhr.onreadystatechange = function () {
 	            if (xhr.readyState == 4) {
 	                if (xhr.status >= 200 & xhr.status <= 300 || xhr.status == 304) {
-	                    var text = xhr.responseText;
-	                    console.log(text);
+	                    var text = JSON.parse(xhr.responseText);
+	                    if (text.status == 200) {
+	                        dispatch(submitSuccess());
+	                        _reactRouter.browserHistory.push('/status');
+	                    } else {
+	                        dispatch(submitFail());
+	                    }
 	                }
 	            }
 	        };
-	        xhr.send("pid=" + pid + "&code=" + code + "&lang=c");
+	        xhr.send("pid=" + pid + "&code=" + code + "&lang=c&author=" + author);
 	    };
 	}
 
@@ -36210,6 +36236,24 @@
 	//         type: 'EMPTY'
 	//     }
 	// }
+
+	function requireLogin() {
+	    return {
+	        type: 'REQUIRELOGIN'
+	    };
+	}
+
+	function submitSuccess() {
+	    return {
+	        type: 'SUBMITSUCCESS'
+	    };
+	}
+
+	function submitFail() {
+	    return {
+	        type: 'SUBMITFAIL'
+	    };
+	}
 
 	function detail(data, key) {
 	    return {
@@ -36291,7 +36335,11 @@
 	            var pid = this.props.params.pid;
 	            console.log(this.state.code);
 	            console.log(pid);
-	            this.props.dispatch((0, _detailAction.submit)(pid, this.state.code));
+	            if (this.props.isLogin) {
+	                this.props.dispatch((0, _detailAction.submit)(pid, this.state.code, this.props.username, this.props));
+	            } else {
+	                this.props.dispatch((0, _detailAction.requireLogin)());
+	            }
 	        }
 	    }, {
 	        key: 'render',
@@ -36322,7 +36370,14 @@
 	    return Codemirror;
 	}(_react2.default.Component);
 
-	exports.default = (0, _reactRedux.connect)()(Codemirror);
+	function checkLogin(state) {
+	    return {
+	        isLogin: state.reducers.login.isLogin,
+	        username: state.reducers.login.username
+	    };
+	}
+
+	exports.default = (0, _reactRedux.connect)(checkLogin)(Codemirror);
 
 	// var Codemirror = React.createClass({
 	//     getInitialState: function() {
@@ -46059,34 +46114,48 @@
 	                        _react2.default.createElement(
 	                            'td',
 	                            null,
-	                            'data.status'
+	                            data.sbmtime
 	                        ),
 	                        _react2.default.createElement(
 	                            'td',
 	                            null,
-	                            'data.pid'
+	                            data.status
 	                        ),
 	                        _react2.default.createElement(
 	                            'td',
 	                            null,
-	                            'data.time'
+	                            data.pid
 	                        ),
 	                        _react2.default.createElement(
 	                            'td',
 	                            null,
-	                            'data.memory'
+	                            data.time
 	                        ),
 	                        _react2.default.createElement(
 	                            'td',
 	                            null,
-	                            'data.lang'
+	                            data.memory
 	                        ),
-	                        _react2.default.createElement('td', null)
+	                        _react2.default.createElement(
+	                            'td',
+	                            null,
+	                            data.codelen
+	                        ),
+	                        _react2.default.createElement(
+	                            'td',
+	                            null,
+	                            data.lang
+	                        ),
+	                        _react2.default.createElement(
+	                            'td',
+	                            null,
+	                            data.author
+	                        )
 	                    );
 	                });
 	                return _react2.default.createElement(
 	                    'table',
-	                    { 'class': 'table table-striped table-hover second-block' },
+	                    { className: 'table table-striped table-hover second-block' },
 	                    _react2.default.createElement(
 	                        'thead',
 	                        null,
@@ -46139,12 +46208,17 @@
 	                                'Author'
 	                            )
 	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'tbody',
+	                        null,
+	                        _status
 	                    )
 	                );
 	            } else {
 	                return _react2.default.createElement(
 	                    'table',
-	                    { 'class': 'table table-striped table-hover second-block' },
+	                    { className: 'table table-striped table-hover second-block' },
 	                    _react2.default.createElement(
 	                        'thead',
 	                        null,
@@ -46206,7 +46280,13 @@
 	    return Status;
 	}(_react2.default.Component);
 
-	exports.default = (0, _reactRedux.connect)()(Status);
+	function display(state) {
+	    return {
+	        statinfolist: state.reducers.statInfoList
+	    };
+	}
+
+	exports.default = (0, _reactRedux.connect)(display)(Status);
 
 /***/ },
 /* 328 */
@@ -46219,6 +46299,7 @@
 	});
 	exports.problems = problems;
 	exports.contests = contests;
+	exports.status = status;
 	exports.clickPage = clickPage;
 	exports.nextPage = nextPage;
 	exports.prePage = prePage;
@@ -46258,6 +46339,17 @@
 	        fetch('/scontests?page=1').then(checkStatus).then(parseJSON).then(function (data) {
 	            console.log('request succeeded with JSON response', data);
 	            dispatch(contestsReceive(data));
+	        }).catch(function (err) {
+	            console.log('error failed', err);
+	        });
+	    };
+	}
+
+	function status() {
+	    return function (dispatch) {
+	        fetch('/sstatusinfo?page=1').then(checkStatus).then(parseJSON).then(function (data) {
+	            console.log('request succeeded with JSON response', data);
+	            dispatch(statusReceive(data));
 	        }).catch(function (err) {
 	            console.log('error failed', err);
 	        });

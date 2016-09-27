@@ -45,6 +45,20 @@ export function contests() {
     }
 }
 
+export function status() {
+    return function(dispatch) {
+        fetch('/sstatusinfo?page=1')
+            .then(checkStatus)
+            .then(parseJSON)
+            .then((data) => {
+                console.log('request succeeded with JSON response', data);
+                dispatch(statusReceive(data))
+            }).catch((err) => {
+            console.log('error failed', err);
+        });
+    }
+}
+
 export function clickPage(data) {
     return {
         type: "CLICKPAGE",

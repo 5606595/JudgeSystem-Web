@@ -19,28 +19,34 @@ class Status extends React.Component {
                             i
                         </td>
                         <td>
-                            data.status
+                            { data.sbmtime }
                         </td>
                         <td>
-                            data.pid
+                            { data.status }
                         </td>
                         <td>
-                            data.time
+                            { data.pid }
                         </td>
                         <td>
-                            data.memory
+                            { data.time }
                         </td>
                         <td>
-                            data.lang
+                            { data.memory }
                         </td>
                         <td>
-
+                            { data.codelen }
+                        </td>
+                        <td>
+                            { data.lang }
+                        </td>
+                        <td>
+                            { data.author }
                         </td>
                     </tr>
                 )
             })
             return (
-                <table class="table table-striped table-hover second-block">
+                <table className="table table-striped table-hover second-block">
                     <thead>
                     <tr>
                         <th>#</th>
@@ -54,11 +60,14 @@ class Status extends React.Component {
                         <th>Author</th>
                     </tr>
                     </thead>
+                    <tbody>
+                    { status }
+                    </tbody>
                 </table>
             )
         } else {
             return (
-                <table class="table table-striped table-hover second-block">
+                <table className="table table-striped table-hover second-block">
                     <thead>
                     <tr>
                         <th>#</th>
@@ -78,4 +87,10 @@ class Status extends React.Component {
     }
 }
 
-export default connect()(Status)
+function display(state) {
+    return  {
+        statinfolist: state.reducers.statInfoList
+    }
+}
+
+export default connect(display)(Status)

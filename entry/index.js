@@ -57,6 +57,7 @@ render((
                 <Route path="/problem/:pid" component={Problem} />
                 <Route path="/submit/:pid" component={Codemirror} />
                 <Route path="/contests" component={ContestsSection} />
+                <Route path="/status" component={StatusSection} />
                 <Route path="/about" component={About} />
                 <Route path="/signup" component={Signup} />
                 <Route path="*" component={NoMatch}/>

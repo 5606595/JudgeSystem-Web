@@ -123,6 +123,24 @@ export default function (state={
                 info: 'login success',
                 kind: 'success'
             })
+        case 'REQUIRELOGIN':
+            return Object.assign({}, state, {
+                num: state.num + 1,
+                info: 'You have not logined',
+                kind: 'error'
+            })
+        case 'SUBMITSUCCESS':
+            return Object.assign({}, state, {
+                num: state.num + 1,
+                info: 'submit success',
+                kind: 'success'
+            })
+        case 'SUBMITFAIL':
+            return Object.assign({}, state, {
+                num: state.num + 1,
+                info: 'submit fail, please contact the admin',
+                kind: 'error'
+            })
         // case 'EMPTY':
         //     return Object.assign({}, state, {
         //         detail: {}

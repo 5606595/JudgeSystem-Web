@@ -7,6 +7,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import 'codemirror/mode/cmake/cmake'
 import { submit } from '../../action/detailAction'
+import { requireLogin } from '../../action/detailAction'
 
 class Codemirror extends React.Component {
     constructor(props) {
@@ -27,7 +28,11 @@ class Codemirror extends React.Component {
         let pid = this.props.params.pid;
         console.log(this.state.code);
         console.log(pid);
-        this.props.dispatch(submit(pid, this.state.code))
+        if(this.props.isLogin) {
+            this.props.dispatch(submit(pid, this.state.code, this.props.username, this.props))
+        } else {
+            this.props.dispatch(requireLogin())
+        }
     }
     render() {
         let options = {
@@ -47,7 +52,15 @@ class Codemirror extends React.Component {
     }
 }
 
-export default connect()(Codemirror);
+function checkLogin(state) {
+    return {
+        isLogin: state.reducers.login.isLogin,
+        username: state.reducers.login.username
+    }
+}
+
+
+export default connect(checkLogin)(Codemirror);
 
 // var Codemirror = React.createClass({
 //     getInitialState: function() {
